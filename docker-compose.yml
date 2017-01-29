@@ -1,0 +1,37 @@
+version: "2"
+
+services:
+
+    php:
+        image: php:7.1.1-fpm-alpine
+        volumes_from:
+            - storage
+        ports:
+            - "9000:9000"
+
+    nginx:
+        image: nginx:1.11.9-alpine
+        volumes_from:
+            - storage
+        ports:
+            - "80:80"
+            - "443:443"
+        links:
+            - php
+
+    mariadb:
+        image: mariadb:10.1.21
+        volumes_from:
+            - storage
+        environment:
+            MYSQL_DATABASE: mariadb_database
+            MYSQL_USER: mariadb_default_user
+            MYSQL_PASSWORD: mariadb_default_password
+            MYSQL_ROOT_PASSWORD: mariadb_root_password
+
+    storage:
+        image: busybox
+        tty: true
+        volumes:
+            - ./storage/etc/nginx/conf.d:/etc/nginx/conf.d:ro
+            - ./storage/var/www:/var/www
