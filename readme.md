@@ -1,9 +1,9 @@
-# Docker-Alpine-Php7 (with nginx and maridb and non dockerfile)
+# Docker-Alpine-Php7 (and non dockerfile)
 
 | type | value |
 |------|-------|
 | VirtualMachine | Docker |
-| front | nginx:1.11.13-alpine |
+| web | nginx:1.11.13-alpine |
 | | h2o-http2-server:v2.2.0 (alpine base) |
 | app   | php:7.1.3-fpm-alpine |
 | | hhvm:fastcgi:latest (not alpine: debian/jessie) |
