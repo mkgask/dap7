@@ -3,24 +3,81 @@ version: "2"
 services:
 
     php:
-        image: php:7.1.1-fpm-alpine
+        image: php:7.1.3-fpm-alpine
         volumes_from:
             - storage
         ports:
             - "9000:9000"
+        expose:
+            - 9000
 
-    nginx:
-        image: nginx:1.11.9-alpine
+    hhvm:
+        image: diegomarangoni/hhvm:fastcgi
+        volumes_from:
+            - storage
+        ports:
+            - "9000:9000"
+        expose:
+            - 9000
+
+    h2oweb-php:
+        image: lkwg82/h2o-http2-server:v2.2.0
         volumes_from:
             - storage
         ports:
             - "80:80"
             - "443:443"
+        expose:
+            - 80
+            - 443
         links:
             - php
+            - mariadb
+
+    h2oweb-hhvm:
+        image: lkwg82/h2o-http2-server:v2.2.0
+        volumes_from:
+            - storage
+        ports:
+            - "80:80"
+            - "443:443"
+        expose:
+            - 80
+            - 443
+        links:
+            - hhvm
+            - mariadb
+
+    nginx-php:
+        image: nginx:1.11.13-alpine
+        volumes_from:
+            - storage
+        ports:
+            - "80:80"
+            - "443:443"
+        expose:
+            - 80
+            - 443
+        links:
+            - php
+            - mariadb
+
+    nginx-hhvm:
+        image: nginx:1.11.13-alpine
+        volumes_from:
+            - storage
+        ports:
+            - "80:80"
+            - "443:443"
+        expose:
+            - 80
+            - 443
+        links:
+            - hhvm
+            - mariadb
 
     mariadb:
-        image: mariadb:10.1.21
+        image: mariadb:10.1.22
         volumes_from:
             - storage
         environment:
@@ -33,5 +90,6 @@ services:
         image: busybox
         tty: true
         volumes:
+            - ./storage/etc/h2o/h2o.conf:/etc/h2o/h2o.conf:ro
             - ./storage/etc/nginx/conf.d:/etc/nginx/conf.d:ro
             - ./storage/var/www:/var/www
